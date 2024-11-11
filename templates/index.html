@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Linear Regression Hypothesis Testing and Confidence Intervals</title>
@@ -10,6 +11,7 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             width: 800px;
             max-width: 95%;
@@ -20,23 +22,30 @@
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1, h2, h3 {
+
+        h1,
+        h2,
+        h3 {
             color: #333;
             margin-bottom: 20px;
         }
+
         form {
             margin-top: 20px;
         }
+
         .form-group {
             margin: 15px 0;
             text-align: left;
         }
+
         label {
             display: block;
             font-weight: bold;
             margin-bottom: 5px;
             color: #555;
         }
+
         input[type="number"],
         select {
             width: 100%;
@@ -46,6 +55,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         button {
             margin-top: 20px;
             padding: 12px 30px;
@@ -56,29 +66,35 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #3071E8;
         }
+
         hr {
             margin: 40px 0;
             border: none;
             height: 1px;
             background-color: #ddd;
         }
+
         .result-section {
             margin-top: 40px;
         }
+
         img {
             max-width: 100%;
             height: auto;
             margin-top: 20px;
             border: 1px solid #ddd;
         }
+
         p {
             color: #333;
             font-size: 16px;
             margin: 10px 0;
         }
+
         .footer {
             margin-top: 60px;
             color: #888;
@@ -86,6 +102,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Linear Regression Simulations</h1>
@@ -126,100 +143,105 @@
         </form>
 
         {% if plot1 %}
-            <hr>
-            <div class="result-section">
-                <h2>Data Generation Results</h2>
+        <hr>
+        <div class="result-section">
+            <h2>Data Generation Results</h2>
 
-                <h3>Scatter Plot with Regression Line</h3>
-                <img src="{{ url_for('static', filename='plot1.png') }}" alt="Regression Plot">
+            <h3>Scatter Plot with Regression Line</h3>
+            <img src="{{ url_for('static', filename='plot1.png') }}?{{ unique_id }}" alt="Regression Plot">
 
-                <h3>Histogram of Slopes and Intercepts</h3>
-                <img src="{{ url_for('static', filename='plot2.png') }}" alt="Histogram Plot">
+            <h3>Histogram of Slopes and Intercepts</h3>
+            <img src="{{ url_for('static', filename='plot2.png') }}?{{ unique_id }}" alt="Histogram Plot">
 
-                {% if slope_extreme is defined and slope_extreme is not none %}
-                    <p><strong>Proportion of slopes more extreme than observed slope:</strong> {{ slope_extreme | round(4) }}</p>
-                {% endif %}
-                {% if intercept_extreme is defined and intercept_extreme is not none %}
-                    <p><strong>Proportion of intercepts more extreme than observed intercept:</strong> {{ intercept_extreme | round(4) }}</p>
-                {% endif %}
+            {% if slope_extreme is defined and slope_extreme is not none %}
+            <p><strong>Proportion of slopes more extreme than observed slope:</strong> {{ slope_extreme | round(4) }}
+            </p>
+            {% endif %}
+            {% if intercept_extreme is defined and intercept_extreme is not none %}
+            <p><strong>Proportion of intercepts more extreme than observed intercept:</strong> {{ intercept_extreme |
+                round(4) }}</p>
+            {% endif %}
 
-                <!-- Hypothesis Testing Form -->
-                <form method="POST" action="/hypothesis_test">
-                    <!-- Hidden inputs to pass data generation parameters -->
-                    <!-- Parameters are stored in session -->
-                    <div class="form-group">
-                        <label for="parameter">Parameter to Test:</label>
-                        <select id="parameter" name="parameter">
-                            <option value="" selected>--Select Parameter--</option>
-                            <option value="slope">Slope</option>
-                            <option value="intercept">Intercept</option>
-                        </select>
-                    </div>
+            <!-- Hypothesis Testing Form -->
+            <form method="POST" action="/hypothesis_test">
+                <!-- Hidden inputs to pass data generation parameters -->
+                <!-- Parameters are stored in session -->
+                <div class="form-group">
+                    <label for="parameter">Parameter to Test:</label>
+                    <select id="parameter" name="parameter">
+                        <option value="" selected>--Select Parameter--</option>
+                        <option value="slope">Slope</option>
+                        <option value="intercept">Intercept</option>
+                    </select>
+                </div>
 
-                    <p>The null hypothesis will use the parameter value specified during data generation.</p>
+                <p>The null hypothesis will use the parameter value specified during data generation.</p>
 
-                    <div class="form-group">
-                        <label for="test_type">Type of Test:</label>
-                        <select id="test_type" name="test_type">
-                            <option value="">--Select Test Type--</option>
-                            <option value=">">Greater than ( > )</option>
-                            <option value="<">Less than ( < )</option>
-                            <option value="!=">Not equal to ( ≠ )</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="test_type">Type of Test:</label>
+                    <select id="test_type" name="test_type">
+                        <option value="">--Select Test Type--</option>
+                        <option value=">">Greater than ( > )</option>
+                        <option value="<">Less than ( < )</option>
+                        <option value="!=">Not equal to ( ≠ )</option>
+                    </select>
+                </div>
 
-                    <button type="submit">Run Hypothesis Testing</button>
-                </form>
+                <button type="submit">Run Hypothesis Testing</button>
+            </form>
 
-                {% if plot3 %}
-                    <h3>Hypothesis Testing Results</h3>
-                    <p><strong>Parameter Tested:</strong> {{ parameter.capitalize() }}</p>
-                    <p><strong>Observed {{ parameter.capitalize() }}:</strong> {{ observed_stat | round(4) }}</p>
-                    <p><strong>Hypothesized Value (H₀):</strong> {{ hypothesized_value }}</p>
-                    <p><strong>p-value:</strong> {{ p_value | round(4) }}</p>
-                    {% if fun_message %}
-                        <p><strong>{{ fun_message }}</strong></p>
-                    {% endif %}
-                    <img src="{{ url_for('static', filename='plot3.png') }}" alt="Hypothesis Testing Plot">
-                {% endif %}
+            {% if plot3 %}
+            <h3>Hypothesis Testing Results</h3>
+            <p><strong>Parameter Tested:</strong> {{ parameter.capitalize() }}</p>
+            <p><strong>Observed {{ parameter.capitalize() }}:</strong> {{ observed_stat | round(4) }}</p>
+            <p><strong>Hypothesized Value (H₀):</strong> {{ hypothesized_value }}</p>
+            <p><strong>p-value:</strong> {{ p_value | round(4) }}</p>
+            {% if fun_message %}
+            <p><strong>{{ fun_message }}</strong></p>
+            {% endif %}
+            <img src="{{ url_for('static', filename='plot3.png') }}?{{ unique_id }}" alt="Hypothesis Testing Plot">
+            {% endif %}
 
-                <!-- Confidence Interval Form -->
-                <h3>Confidence Intervals</h3>
+            <!-- Confidence Interval Form -->
+            <h3>Confidence Intervals</h3>
 
-                <form method="POST" action="/confidence_interval">
-                    <!-- Parameters are stored in session -->
-                    <div class="form-group">
-                        <label for="parameter">Parameter for Confidence Interval:</label>
-                        <select id="parameter" name="parameter">
-                            <option value="" selected>--Select Parameter--</option>
-                            <option value="slope">Slope</option>
-                            <option value="intercept">Intercept</option>
-                        </select>
-                    </div>
+            <form method="POST" action="/confidence_interval">
+                <!-- Parameters are stored in session -->
+                <div class="form-group">
+                    <label for="parameter">Parameter for Confidence Interval:</label>
+                    <select id="parameter" name="parameter">
+                        <option value="" selected>--Select Parameter--</option>
+                        <option value="slope">Slope</option>
+                        <option value="intercept">Intercept</option>
+                    </select>
+                </div>
 
-                    <div class="form-group">
-                        <label for="confidence_level">Confidence Level (%):</label>
-                        <select id="confidence_level" name="confidence_level">
-                            <option value="">--Select Confidence Level--</option>
-                            <option value="90">90%</option>
-                            <option value="95">95%</option>
-                            <option value="99">99%</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="confidence_level">Confidence Level (%):</label>
+                    <select id="confidence_level" name="confidence_level">
+                        <option value="">--Select Confidence Level--</option>
+                        <option value="20">20%</option>
+                        <option value="90">90%</option>
+                        <option value="95">95%</option>
+                        <option value="99">99%</option>
+                    </select>
+                </div>
 
-                    <button type="submit">Calculate Confidence Interval</button>
-                </form>
+                <button type="submit">Calculate Confidence Interval</button>
+            </form>
 
-                {% if plot4 %}
-                    <h3>Confidence Interval Results</h3>
-                    <p><strong>{{ confidence_level }}% Confidence Interval for {{ parameter.capitalize() }}:</strong> [{{ ci_lower | round(4) }}, {{ ci_upper | round(4) }}]</p>
-                    <p><strong>Mean Estimate:</strong> {{ mean_estimate | round(4) }}</p>
-                    <p><strong>Confidence Interval Includes True Parameter:</strong> {{ includes_true }}</p>
-                    <img src="{{ url_for('static', filename='plot4.png') }}" alt="Confidence Interval Plot">
-                {% endif %}
+            {% if plot4 %}
+            <h3>Confidence Interval Results</h3>
+            <p><strong>{{ confidence_level }}% Confidence Interval for {{ parameter.capitalize() }}:</strong> [{{
+                ci_lower | round(4) }}, {{ ci_upper | round(4) }}]</p>
+            <p><strong>Mean Estimate:</strong> {{ mean_estimate | round(4) }}</p>
+            <p><strong>Confidence Interval Includes True Parameter:</strong> {{ includes_true }}</p>
+            <img src="{{ url_for('static', filename='plot4.png') }}?{{ unique_id }}" alt="Confidence Interval Plot">
+            {% endif %}
 
-            </div>
+        </div>
         {% endif %}
     </div>
 </body>
+
 </html>
